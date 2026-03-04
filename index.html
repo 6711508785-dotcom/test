@@ -28,3 +28,133 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+h2, h3 { text-align: center; color: #333; }
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+button {
+    padding: 10px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover { background-color: #27ae60; }
+
+ul { list-style: none; padding: 0; }
+
+li {
+    background: #fff;
+    border-left: 5px solid #e74c3c;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-btn {
+    background: #ff4757;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } 
+       from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase Configuration จากที่คุณให้มา
+const firebaseConfig = {
+  apiKey: "AIzaSyCBSIWMIxzmwD17hdyBwDXMksv3dAJR92M",
+  authDomain: "chotimaapp.firebaseapp.com",
+  projectId: "chotimaapp",
+  storageBucket: "chotimaapp.firebasestorage.app",
+  messagingSenderId: "986266813051",
+  appId: "1:986266813051:web:f53384cb8906240c7398de",
+  measurementId: "G-X1QQT6ZJYZ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const colRef = collection(db, "assignments");
+
+// อ้างอิง HTML Elements
+const subjectInput = document.getElementById('subject');
+const taskInput = document.getElementById('task');
+const deadlineInput = document.getElementById('deadline');
+const addBtn = document.getElementById('addBtn');
+const taskList = document.getElementById('taskList');
+
+// ฟังก์ชันเพิ่มข้อมูลลง Firebase
+addBtn.addEventListener('click', async () => {
+    if (subjectInput.value && taskInput.value && deadlineInput.value) {
+        await addDoc(colRef, {
+            subject: subjectInput.value,
+            task: taskInput.value,
+            deadline: deadlineInput.value,
+            createdAt: new Date()
+        });
+        // ล้างค่าในช่อง Input
+        subjectInput.value = '';
+        taskInput.value = '';
+        deadlineInput.value = '';
+    } else {
+        alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+    }
+});
+
+// ดึงข้อมูลแบบ Real-time (OnSnapshot)
+const q = query(colRef, orderBy("deadline", "asc"));
+onSnapshot(q, (snapshot) => {
+    taskList.innerHTML = '';
+    snapshot.docs.forEach(docData => {
+        const item = docData.data();
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div>
+                <strong>[${item.subject}]</strong> ${item.task} <br>
+                <small>📅 กำหนดส่ง: ${item.deadline}</small>
+            </div>
+            <button class="delete-btn" onclick="deleteTask('${docData.id}')">ลบ</button>
+        `;
+        taskList.appendChild(li);
+    });
+});
+
+// ฟังก์ชันลบงาน (ทำเป็น Global เพื่อให้ปุ่มใน HTML เรียกใช้ได้)
+window.deleteTask = async (id) => {
+    const docRef = doc(db, "assignments", id);
+    await deleteDoc(docRef);
+};
