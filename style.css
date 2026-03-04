@@ -1,62 +1,25 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-}
+// ค้นหาในฟังก์ชัน onSnapshot แล้วแทนที่ด้วยส่วนนี้ครับ
+onSnapshot(q, (snapshot) => {
+    taskList.innerHTML = '';
+    snapshot.docs.forEach(docData => {
+        const item = docData.data();
+        let colorClass = 'card-blue'; // ค่าเริ่มต้น
+        
+        // เช็ควิชาเพื่อเปลี่ยนสี Card
+        if(item.subject === 'English') colorClass = 'card-pink';
+        if(item.subject === 'Science') colorClass = 'card-purple';
+        if(item.subject === 'Mathematics') colorClass = 'card-blue';
 
-.container {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 500px;
-}
-
-h2, h3 { text-align: center; color: #333; }
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-}
-
-button {
-    padding: 10px;
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-button:hover { background-color: #27ae60; }
-
-ul { list-style: none; padding: 0; }
-
-li {
-    background: #fff;
-    border-left: 5px solid #e74c3c;
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.delete-btn {
-    background: #ff4757;
-    padding: 5px 10px;
-    font-size: 12px;
-}
+        const li = document.createElement('li');
+        li.className = colorClass; // ใส่ Class สีที่นี่
+        li.innerHTML = `
+            <div>
+                <strong style="color: #555;">${item.subject}</strong><br>
+                <span style="font-size: 1.1rem; color: #333;">${item.task}</span><br>
+                <small style="color: #888;">⏰ Deadline: ${item.deadline}</small>
+            </div>
+            <button class="delete-btn" onclick="deleteTask('${docData.id}')">✕</button>
+        `;
+        taskList.appendChild(li);
+    });
+});
