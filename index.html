@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Assignment Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h2>📚 ระบบบันทึกงานค้าง</h2>
+        
+        <div class="input-group">
+            <input type="text" id="subject" placeholder="ชื่อวิชา...">
+            <input type="text" id="task" placeholder="ชื่องาน/รายละเอียด...">
+            <input type="date" id="deadline">
+            <button id="addBtn">เพิ่มรายการงาน</button>
+        </div>
+
+        <hr>
+
+        <h3>รายการงานทั้งหมด</h3>
+        <ul id="taskList">
+            </ul>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
